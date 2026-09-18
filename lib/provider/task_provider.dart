@@ -14,8 +14,8 @@ class TaskNotifier extends StateNotifier<List<Task>> {
     state = _taskBox.values.toList();
   }
 
-  void addTask(String title) {
-    final newTask = Task(title: title);
+  void addTask(String title, {TaskPriority priority = TaskPriority.low}) {
+    final newTask = Task(title: title, priorityIndex: priority.index);
     _taskBox.add(newTask);
     state = _taskBox.values.toList();
   }

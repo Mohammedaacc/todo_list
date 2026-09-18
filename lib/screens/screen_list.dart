@@ -1,4 +1,6 @@
+import 'package:expence_list/model/task.dart';
 import 'package:expence_list/provider/task_provider.dart';
+import 'package:expence_list/screens/dashboard_screen.dart';
 import 'package:expence_list/widget/mybutton.dart';
 import 'package:expence_list/widget/todoTask.dart';
 import 'package:flutter/material.dart';
@@ -13,6 +15,7 @@ class ScreenList extends ConsumerStatefulWidget {
 
 class _ScreenListState extends ConsumerState<ScreenList> {
   final textController = TextEditingController();
+  TaskPriority _selectedpriority = TaskPriority.low;
 
   @override
   void dispose() {
@@ -26,21 +29,74 @@ class _ScreenListState extends ConsumerState<ScreenList> {
 
     return Scaffold(
       appBar: AppBar(
+        foregroundColor: Colors.white,
         title: const Text('Todo List'),
         backgroundColor: const Color.fromRGBO(62, 15, 141, 1),
+        actions: [
+          IconButton(
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (context) => DashboardScreen()),
+              );
+            },
+            icon: const Icon(Icons.dashboard),
+          ),
+        ],
       ),
+
       floatingActionButton: FloatingActionButton(
         onPressed: () {
+          setState(() {
+            _selectedpriority = TaskPriority.low;
+          });
           showDialog(
             context: context,
             builder: (context) {
               return AlertDialog(
                 title: const Text('add task'),
-                content: TextField(
-                  controller: textController,
-                  decoration: const InputDecoration(
-                    hintText: 'Enter task title',
-                  ),
+                content: Column(
+                  children: [
+                    TextField(
+                      controller: textController,
+                      decoration: const InputDecoration(
+                        hintText: 'Enter task title',
+                      ),
+                    ),
+                    SizedBox(height: 16),
+                    Row(
+                      children: [
+                        Text(
+                          'Priority :',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        SizedBox(width: 8),
+                        DropdownButton<TaskPriority>(
+                          value: _selectedpriority,
+                          items: TaskPriority.values.map((priority) {
+                            return DropdownMenuItem(
+                              value: priority,
+                              child: Text(
+                                priority.name.toUpperCase(),
+                                style: TextStyle(
+                                  color: priority == TaskPriority.high
+                                      ? Colors.red
+                                      : priority == TaskPriority.medium
+                                      ? Colors.orange
+                                      : Colors.green,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            );
+                          }).toList(),
+                          onChanged: (value) {
+                            if (value != null) {
+                              _selectedpriority = value;
+                            }
+                          },
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
                 actions: [
                   Row(
@@ -50,7 +106,9 @@ class _ScreenListState extends ConsumerState<ScreenList> {
                         onPressed: () {
                           final title = textController.text.trim();
                           if (title.isNotEmpty) {
-                            ref.read(taskProvider.notifier).addTask(title);
+                            ref
+                                .read(taskProvider.notifier)
+                                .addTask(title, priority: _selectedpriority);
                           }
                           textController.clear();
                           Navigator.of(context).pop();
@@ -114,6 +172,7 @@ class _ScreenListState extends ConsumerState<ScreenList> {
                     child: TodoTaks(
                       title: currentTask.title,
                       isCompleted: currentTask.isCompleted,
+                      priority: currentTask.priority,
                       onChanged: (value) {
                         ref.read(taskProvider.notifier).toggleTask(currentTask);
                       },
