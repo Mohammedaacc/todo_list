@@ -10,19 +10,6 @@ class DashboardScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final taskLists = ref.watch(taskProvider);
 
-    final totalList = taskLists.length;
-    final comliteTask = taskLists.where((t) => t.isCompleted).length;
-    final penddingTask = totalList - comliteTask;
-    final highPriority = taskLists
-        .where(
-          (high) => high.priority == TaskPriority.high && !high.isCompleted,
-        )
-        .length;
-
-    final progressPer = totalList == 0 ? 0.0 : comliteTask / totalList;
-
-    final percentageInt = (progressPer * 100).toInt();
-
     return Scaffold(
       appBar: AppBar(
         foregroundColor: Colors.white,
@@ -30,104 +17,123 @@ class DashboardScreen extends ConsumerWidget {
         backgroundColor: const Color.fromRGBO(62, 15, 141, 1),
       ),
       backgroundColor: const Color.fromRGBO(149, 100, 221, 1),
-      body: Padding(
-        padding: EdgeInsets.all(16),
-        child: Column(
-          children: [
-            Container(
-              padding: EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(16),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.2),
-                    blurRadius: 8,
-                    offset: Offset(0, 4),
-                  ),
-                ],
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text(
-                        'Task Completion',
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                        ),
-                      ),
-                      Text(
-                        '$percentageInt%',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 18,
-                          color: Color.fromRGBO(62, 15, 141, 1),
-                        ),
+      body: taskLists.when(
+        data: (task) {
+          final totalList = task.length;
+          final comliteTask = task.where((t) => t.isCompleted).length;
+          final penddingTask = totalList - comliteTask;
+          final highPriority = task
+              .where(
+                (high) =>
+                    high.priority == TaskPriority.high && !high.isCompleted,
+              )
+              .length;
+
+          final progressPer = totalList == 0 ? 0.0 : comliteTask / totalList;
+
+          final percentageInt = (progressPer * 100).toInt();
+          return Padding(
+            padding: EdgeInsets.all(16),
+            child: Column(
+              children: [
+                Container(
+                  padding: EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.2),
+                        blurRadius: 8,
+                        offset: Offset(0, 4),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 12),
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(10),
-                    child: LinearProgressIndicator(
-                      value: progressPer,
-                      backgroundColor: Colors.grey,
-                      minHeight: 12,
-                      valueColor: const AlwaysStoppedAnimation<Color>(
-                        Colors.green,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
+                            'Task Completion',
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
+                          ),
+                          Text(
+                            '$percentageInt%',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 18,
+                              color: Color.fromRGBO(62, 15, 141, 1),
+                            ),
+                          ),
+                        ],
                       ),
-                    ),
+                      const SizedBox(height: 12),
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(10),
+                        child: LinearProgressIndicator(
+                          value: progressPer,
+                          backgroundColor: Colors.grey,
+                          minHeight: 12,
+                          valueColor: const AlwaysStoppedAnimation<Color>(
+                            Colors.green,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        "$comliteTask of $totalList tasks complited",
+                        style: TextStyle(color: Colors.black, fontSize: 12),
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 8),
-                  Text(
-                    "$comliteTask of $totalList tasks complited",
-                    style: TextStyle(color: Colors.black, fontSize: 12),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 20),
-            Expanded(
-              child: GridView.count(
-                crossAxisCount: 2,
-                crossAxisSpacing: 16,
-                mainAxisSpacing: 16,
-                children: [
-                  _dashboardCard(
-                    'Total Tasks',
-                    totalList.toString(),
-                    Colors.blue,
-                    Icons.list,
-                  ),
+                ),
+                const SizedBox(height: 20),
+                Expanded(
+                  child: GridView.count(
+                    crossAxisCount: 2,
+                    crossAxisSpacing: 16,
+                    mainAxisSpacing: 16,
+                    children: [
+                      _dashboardCard(
+                        'Total Tasks',
+                        totalList.toString(),
+                        Colors.blue,
+                        Icons.list,
+                      ),
 
-                  _dashboardCard(
-                    'Complited',
-                    comliteTask.toString(),
-                    Colors.green,
-                    Icons.check_circle,
+                      _dashboardCard(
+                        'Complited',
+                        comliteTask.toString(),
+                        Colors.green,
+                        Icons.check_circle,
+                      ),
+                      _dashboardCard(
+                        'Pendding',
+                        penddingTask.toString(),
+                        Colors.orange,
+                        Icons.hourglass_empty,
+                      ),
+                      _dashboardCard(
+                        'High Priority',
+                        highPriority.toString(),
+                        Colors.red,
+                        Icons.warning,
+                      ),
+                    ],
                   ),
-                  _dashboardCard(
-                    'Pendding',
-                    penddingTask.toString(),
-                    Colors.orange,
-                    Icons.hourglass_empty,
-                  ),
-                  _dashboardCard(
-                    'High Priority',
-                    highPriority.toString(),
-                    Colors.red,
-                    Icons.warning,
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
-          ],
-        ),
+          );
+        },
+        error: (e, st) => Center(child: Text('$e')),
+        loading: () => const Center(child: CircularProgressIndicator()),
       ),
     );
   }

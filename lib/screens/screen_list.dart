@@ -55,6 +55,7 @@ class _ScreenListState extends ConsumerState<ScreenList> {
               return AlertDialog(
                 title: const Text('add task'),
                 content: Column(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
                     TextField(
                       controller: textController,
@@ -133,54 +134,61 @@ class _ScreenListState extends ConsumerState<ScreenList> {
         child: const Icon(Icons.add),
       ),
       backgroundColor: const Color.fromRGBO(149, 100, 221, 1),
-      body: taskList.isEmpty
-          ? const Center(child: Text('No tasks available!'))
-          : Padding(
-              padding: const EdgeInsets.all(8),
-              child: ListView.builder(
-                itemCount: taskList.length,
-                itemBuilder: (context, index) {
-                  final currentTask = taskList[index];
+      body: taskList.when(
+        data: (task) {
+          if (task.isEmpty) {
+            return const Center(child: Text('No tasks available!'));
+          }
+          return Padding(
+            padding: const EdgeInsets.all(8),
+            child: ListView.builder(
+              itemCount: task.length,
+              itemBuilder: (context, index) {
+                final currentTask = task[index];
 
-                  return Dismissible(
-                    key: ValueKey(currentTask.key ?? currentTask.id),
-                    background: Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: Container(
-                        height: 80,
-                        width: double.infinity,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(8),
-                          color: Colors.red,
-                        ),
-                        child: const Icon(Icons.delete, color: Colors.white),
+                return Dismissible(
+                  key: ValueKey(currentTask.key),
+                  background: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Container(
+                      height: 80,
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(8),
+                        color: Colors.red,
                       ),
+                      child: const Icon(Icons.delete, color: Colors.white),
                     ),
-                    onDismissed: (direction) {
-                      final removeTask = currentTask;
+                  ),
+                  onDismissed: (direction) {
+                    final removeTask = currentTask;
 
-                      ref.read(taskProvider.notifier).deleteTask(removeTask);
+                    ref.read(taskProvider.notifier).deleteTask(removeTask);
 
-                      ScaffoldMessenger.of(context).clearSnackBars();
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: const Text('Task deleted'),
-                          duration: const Duration(seconds: 2),
-                        ),
-                      );
+                    ScaffoldMessenger.of(context).clearSnackBars();
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: const Text('Task deleted'),
+                        duration: const Duration(seconds: 2),
+                      ),
+                    );
+                  },
+                  child: TodoTaks(
+                    title: currentTask.title,
+                    isCompleted: currentTask.isCompleted,
+                    priority: currentTask.priority,
+                    onChanged: (value) {
+                      ref.read(taskProvider.notifier).toggleTask(currentTask);
                     },
-                    child: TodoTaks(
-                      title: currentTask.title,
-                      isCompleted: currentTask.isCompleted,
-                      priority: currentTask.priority,
-                      onChanged: (value) {
-                        ref.read(taskProvider.notifier).toggleTask(currentTask);
-                      },
-                    ),
-                  );
-                },
-              ),
+                  ),
+                );
+              },
             ),
+          );
+        },
+        error: (e, st) => Center(child: Text('$e')),
+        loading: () => const Center(child: CircularProgressIndicator()),
+      ),
     );
   }
 }

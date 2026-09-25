@@ -2,40 +2,54 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive/hive.dart';
 import 'package:expence_list/model/task.dart';
 
-class TaskNotifier extends StateNotifier<List<Task>> {
-  TaskNotifier() : super([]) {
-    _loadTasks();
+class TaskNotifier extends AsyncNotifier<List<Task>> {
+  @override
+  Future<List<Task>> build() async {
+    final box = Hive.box<Task>('taskBox');
+    return box.values.toList();
   }
 
-  late Box<Task> _taskBox;
-
-  void _loadTasks() {
-    _taskBox = Hive.box<Task>('taskBox');
-    state = _taskBox.values.toList();
-  }
-
-  void addTask(String title, {TaskPriority priority = TaskPriority.low}) {
-    final newTask = Task(title: title, priorityIndex: priority.index);
-    _taskBox.add(newTask);
-    state = _taskBox.values.toList();
-  }
-
-  void toggleTask(Task task) {
-    if (task.isInBox) {
-      task.isCompleted = !task.isCompleted;
-      task.save();
-      state = _taskBox.values.toList();
+  Future<void> addTask(
+    String title, {
+    TaskPriority priority = TaskPriority.low,
+  }) async {
+    state = const AsyncValue.loading();
+    try {
+      final box = Hive.box<Task>('taskBox');
+      final newTask = Task(title: title, priorityIndex: priority.index);
+      await box.add(newTask);
+      state = AsyncValue.data(box.values.toList());
+    } catch (e, st) {
+      state = AsyncValue.error(e, st);
     }
   }
 
-  void deleteTask(Task task) {
+  Future<void> toggleTask(Task task) async {
     if (task.isInBox) {
-      task.delete();
-      state = _taskBox.values.toList();
+      try {
+        task.isCompleted = !task.isCompleted;
+        await task.save();
+        final box = Hive.box<Task>('taskBox');
+        state = AsyncValue.data(box.values.toList());
+      } catch (e, st) {
+        state = AsyncValue.error(e, st);
+      }
+    }
+  }
+
+  Future<void> deleteTask(Task task) async {
+    if (task.isInBox) {
+      try {
+        task.delete();
+        final box = Hive.box<Task>('taskBox');
+        state = AsyncValue.data(box.values.toList());
+      } catch (e, st) {
+        state = AsyncValue.error(e, st);
+      }
     }
   }
 }
 
-final taskProvider = StateNotifierProvider<TaskNotifier, List<Task>>((ref) {
+final taskProvider = AsyncNotifierProvider<TaskNotifier, List<Task>>(() {
   return TaskNotifier();
 });
