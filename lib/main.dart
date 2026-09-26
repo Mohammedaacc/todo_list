@@ -13,10 +13,13 @@ import 'package:hive_flutter/hive_flutter.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  await FirebaseApi().initNotifications();
-  await Hive.initFlutter();
-  await EasyLocalization.ensureInitialized();
+  await Future.wait([
+    Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    ).then((_) => FirebaseApi().initNotifications()),
+    Hive.initFlutter(),
+    EasyLocalization.ensureInitialized(),
+  ]);
 
   Hive.registerAdapter(TaskAdapter());
   await Hive.openBox<Task>('taskBox');
