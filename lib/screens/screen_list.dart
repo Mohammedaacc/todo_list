@@ -5,6 +5,8 @@ import 'package:expence_list/widget/mybutton.dart';
 import 'package:expence_list/widget/todoTask.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:easy_localization/easy_localization.dart';
+import 'package:expence_list/generated/locale_keys.g.dart';
 
 class ScreenList extends ConsumerStatefulWidget {
   const ScreenList({super.key});
@@ -30,9 +32,19 @@ class _ScreenListState extends ConsumerState<ScreenList> {
     return Scaffold(
       appBar: AppBar(
         foregroundColor: Colors.white,
-        title: const Text('Todo List'),
+        title: Text(LocaleKeys.app_title.tr()),
         backgroundColor: const Color.fromRGBO(62, 15, 141, 1),
         actions: [
+          IconButton(
+            onPressed: () {
+              if (context.locale == Locale('en')) {
+                context.setLocale(Locale('ckb'));
+              } else {
+                context.setLocale(Locale("en"));
+              }
+            },
+            icon: const Icon(Icons.language),
+          ),
           IconButton(
             onPressed: () {
               Navigator.of(context).push(
@@ -53,31 +65,37 @@ class _ScreenListState extends ConsumerState<ScreenList> {
             context: context,
             builder: (context) {
               return AlertDialog(
-                title: const Text('add task'),
+                title: Text(LocaleKeys.add_task.tr()),
                 content: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     TextField(
                       controller: textController,
-                      decoration: const InputDecoration(
-                        hintText: 'Enter task title',
+                      decoration: InputDecoration(
+                        hintText: LocaleKeys.enter_task_title.tr(),
                       ),
                     ),
                     SizedBox(height: 16),
                     Row(
                       children: [
                         Text(
-                          'Priority :',
+                          LocaleKeys.priority.tr(),
                           style: TextStyle(fontWeight: FontWeight.bold),
                         ),
                         SizedBox(width: 8),
                         DropdownButton<TaskPriority>(
                           value: _selectedpriority,
                           items: TaskPriority.values.map((priority) {
+                            final String textPriority =
+                                priority == TaskPriority.high
+                                ? LocaleKeys.priority_high.tr()
+                                : priority == TaskPriority.medium
+                                ? LocaleKeys.priority_medium.tr()
+                                : LocaleKeys.priority_low.tr();
                             return DropdownMenuItem(
                               value: priority,
                               child: Text(
-                                priority.name.toUpperCase(),
+                                textPriority,
                                 style: TextStyle(
                                   color: priority == TaskPriority.high
                                       ? Colors.red
@@ -114,7 +132,7 @@ class _ScreenListState extends ConsumerState<ScreenList> {
                           textController.clear();
                           Navigator.of(context).pop();
                         },
-                        text: 'Save',
+                        text: LocaleKeys.save.tr(),
                       ),
                       const SizedBox(width: 8),
                       MyButton(
@@ -122,7 +140,7 @@ class _ScreenListState extends ConsumerState<ScreenList> {
                           textController.clear();
                           Navigator.of(context).pop();
                         },
-                        text: 'Cancel',
+                        text: LocaleKeys.cancel.tr(),
                       ),
                     ],
                   ),
@@ -137,7 +155,7 @@ class _ScreenListState extends ConsumerState<ScreenList> {
       body: taskList.when(
         data: (task) {
           if (task.isEmpty) {
-            return const Center(child: Text('No tasks available!'));
+            return Center(child: Text(LocaleKeys.no_tasks.tr()));
           }
           return Padding(
             padding: const EdgeInsets.all(8),
@@ -168,7 +186,7 @@ class _ScreenListState extends ConsumerState<ScreenList> {
                     ScaffoldMessenger.of(context).clearSnackBars();
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        content: const Text('Task deleted'),
+                        content: Text(LocaleKeys.task_deleted.tr()),
                         duration: const Duration(seconds: 2),
                       ),
                     );

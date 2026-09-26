@@ -2,6 +2,8 @@ import 'package:expence_list/model/task.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:expence_list/provider/task_provider.dart';
+import 'package:easy_localization/easy_localization.dart';
+import 'package:expence_list/generated/locale_keys.g.dart';
 
 class DashboardScreen extends ConsumerWidget {
   const DashboardScreen({super.key});
@@ -13,7 +15,7 @@ class DashboardScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         foregroundColor: Colors.white,
-        title: const Text('Dashboard & overview'),
+        title: Text(LocaleKeys.dashboard_title.tr()),
         backgroundColor: const Color.fromRGBO(62, 15, 141, 1),
       ),
       backgroundColor: const Color.fromRGBO(149, 100, 221, 1),
@@ -55,9 +57,9 @@ class DashboardScreen extends ConsumerWidget {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const Text(
-                            'Task Completion',
-                            style: TextStyle(
+                          Text(
+                            LocaleKeys.task_completion.tr(),
+                            style: const TextStyle(
                               color: Colors.black,
                               fontWeight: FontWeight.bold,
                               fontSize: 16,
@@ -87,7 +89,9 @@ class DashboardScreen extends ConsumerWidget {
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        "$comliteTask of $totalList tasks complited",
+                        LocaleKeys.tasks_completed_summary.tr(
+                          args: [comliteTask.toString(), totalList.toString()],
+                        ),
                         style: TextStyle(color: Colors.black, fontSize: 12),
                       ),
                     ],
@@ -101,26 +105,26 @@ class DashboardScreen extends ConsumerWidget {
                     mainAxisSpacing: 16,
                     children: [
                       _dashboardCard(
-                        'Total Tasks',
+                        LocaleKeys.total_tasks.tr(),
                         totalList.toString(),
                         Colors.blue,
                         Icons.list,
                       ),
 
                       _dashboardCard(
-                        'Complited',
+                        LocaleKeys.completed.tr(),
                         comliteTask.toString(),
                         Colors.green,
                         Icons.check_circle,
                       ),
                       _dashboardCard(
-                        'Pendding',
+                        LocaleKeys.pending.tr(),
                         penddingTask.toString(),
                         Colors.orange,
                         Icons.hourglass_empty,
                       ),
                       _dashboardCard(
-                        'High Priority',
+                        LocaleKeys.high_priority.tr(),
                         highPriority.toString(),
                         Colors.red,
                         Icons.warning,

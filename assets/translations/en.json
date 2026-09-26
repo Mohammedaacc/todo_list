@@ -1,0 +1,20 @@
+{
+    "app_title": "Todo List",
+    "dashboard_title": "Dashboard & overview",
+    "add_task": "Add Task",
+    "enter_task_title": "Enter task title",
+    "priority": "Priority :",
+    "priority_low": "LOW",
+    "priority_medium": "MEDIUM",
+    "priority_high": "HIGH",
+    "save": "Save",
+    "cancel": "Cancel",
+    "no_tasks": "No tasks available!",
+    "task_deleted": "Task deleted",
+    "task_completion": "Task Completion",
+    "tasks_completed_summary": "{} of {} tasks completed",
+    "total_tasks": "Total Tasks",
+    "completed": "Completed",
+    "pending": "Pending",
+    "high_priority": "High Priority"
+}

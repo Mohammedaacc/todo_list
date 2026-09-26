@@ -1,0 +1,20 @@
+{
+    "app_title": "لیستی کارەکان",
+    "dashboard_title": "داشبۆرد و پێداچوونەوە",
+    "add_task": "زیادکردنی کار",
+    "enter_task_title": "سەردێڕی کارەکە بنووسە",
+    "priority": "ئاستی گرنگی :",
+    "priority_low": "نزم",
+    "priority_medium": "ناوەند",
+    "priority_high": "بەرز",
+    "save": "خەزن کردن",
+    "cancel": "پاشگەزبوونەوە",
+    "no_tasks": "هیچ کارێک بەردەست نییە!",
+    "task_deleted": "کارەکە سڕدرایەوە",
+    "task_completion": "ڕێژەی تەواوبوونی کارەکان",
+    "tasks_completed_summary": "{} لە {} کار تەواوکراون",
+    "total_tasks": "سەرجەمی کارەکان",
+    "completed": "تەواوکراوە",
+    "pending": "لە چاوەڕوانیدایە",
+    "high_priority": "گرنگی بەرز"
+}
